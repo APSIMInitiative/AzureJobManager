@@ -1,0 +1,6 @@
+.vs/
+ParallelAPSIM/obj/
+ParallelAPSIM/bin/
+ParallelAPSIM.Tests/obj/
+packages/
+ParallelAPSIM/bin/Debug/azure-apsim.exe.config
