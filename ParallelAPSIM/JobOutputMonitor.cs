@@ -28,14 +28,14 @@ namespace ParallelAPSIM
         public JobOutputMonitor() : this(
             new Storage.StorageCredentials
             {
-                Account = "farmsystemsbatch", 
-                Key = "CknqC3+G5dwYkXPSV3xyHpdfxxws0Wjt57UJShTrtaZcrLCUshf+agHbCcf3R6GhA+REsVpZby9UlRvRwOzRTg=="
+                Account = "", 
+                Key = ""
             },
             new Batch.BatchCredentials
             {
-                Url = "https://farmsystemsbatch.australiaeast.batch.azure.com",
-                Account = "farmsystemsbatch",
-                Key = "ty/+iKLYUjRFwxfxAyMcd/k/sxy8QAd2ppmHq1ZeNY2YivZPQjYopCxDmMSUX1SkTCDf5N4Eb27DRjvvMlSaHA=="
+                Url = "",
+                Account = "",
+                Key = ""
             })
         { }
 
