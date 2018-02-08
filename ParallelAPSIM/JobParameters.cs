@@ -9,9 +9,9 @@ namespace ParallelAPSIM
     public class JobParameters
     {
         public string JobDisplayName { get; set; }
-        public string ModelPath { get; set; }
+		public string ModelPath { get; set; }
         public string ApplicationPackage { get; set; }
-        public string ApplicationPackageVersion { get; set; }
+		public string ApplicationPackageVersion { get; set; }
         public int CoresPerProcess { get; set; }
         public bool JobManagerShouldSubmitTasks { get; set; }
         public bool AutoScale { get; set; }
