@@ -1,0 +1,9 @@
+M:\svn\ParallelAPSIM\ParallelAPSIM\obj\Debug\ParallelAPSIM.csproj.App.config
+M:\svn\ParallelAPSIM\ParallelAPSIM\obj\Debug\ParallelAPSIM.csprojResolveAssemblyReference.cache
+M:\svn\ParallelAPSIM\ParallelAPSIM\obj\Debug\ParallelAPSIM.csproj.CoreCompileInputs.cache
+M:\svn\ParallelAPSIM\ParallelAPSIM\obj\Debug\azure-apsim.exe
+M:\svn\ParallelAPSIM\ParallelAPSIM\obj\Debug\azure-apsim.pdb
+M:\svn\ParallelAPSIM\ParallelAPSIM\bin\Debug\app.agresearch.config
+M:\svn\ParallelAPSIM\ParallelAPSIM\bin\Debug\azure-apsim.exe.config
+M:\svn\ParallelAPSIM\ParallelAPSIM\bin\Debug\azure-apsim.exe
+M:\svn\ParallelAPSIM\ParallelAPSIM\bin\Debug\azure-apsim.pdb
