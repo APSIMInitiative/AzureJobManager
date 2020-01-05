@@ -279,7 +279,8 @@ namespace ParallelAPSIM.Batch.JobMgr
 
         private void storeSummary(Guid jobId)
         {
-            try {
+            try
+            {
                 string summaryPath = Path.Combine(Path.Combine(Environment.GetEnvironmentVariable("TEMP")), "JobManagerResults.stdout");
 
                 if (File.Exists(summaryPath)) File.Delete(summaryPath);
@@ -295,6 +296,19 @@ namespace ParallelAPSIM.Batch.JobMgr
             catch (Exception e)
             {
                 summary += "Error storing job manager summary:" + e.Message + "\n";
+            }
+
+            try
+            {
+                string dir = Path.Combine("C:", "User", "tasks", "shared", jobId.ToString());
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                string file = Path.Combine(dir, "job-manager-fallback.stdout");
+                File.WriteAllText(file, summary);
+            }
+            catch (Exception err)
+            {
+                throw new Exception("Error storing job manager fallback output file", err);
             }
         }
 
@@ -312,36 +326,35 @@ namespace ParallelAPSIM.Batch.JobMgr
 
         public void Execute(Guid jobId, bool submitTasks, bool autoScalePool, CancellationToken ct)
         {
-
-            summary += "Submitting tasks\n";
-            if (submitTasks)
-            {
-                SubmitTasks(jobId, ct);
-            }
-            
-            WaitForTasksToComplete(jobId, autoScalePool, ct);
-
-
-            string recipient = "";
-            string from = "";
-            string pw = "";
-
             try
             {
+                summary += "Submitting tasks\n";
+                if (submitTasks)
+                {
+                    SubmitTasks(jobId, ct);
+                }
+
+                WaitForTasksToComplete(jobId, autoScalePool, ct);
+
+
+                string recipient = "";
+                string from = "";
+                string pw = "";
+
                 summary += "Tasks complete\n";
 
                 _blobClient = _storageAccount.CreateCloudBlobClient();
                 containerRef = _blobClient.GetContainerReference("job-" + jobId + "-outputs");
-
+                containerRef.CreateIfNotExists();
                 //string tempDir = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), jobId.ToString());
-                string tempDir = Path.Combine(Environment.GetEnvironmentVariable("WATASK_TVM_SHARED_DIR"), jobId.ToString(),"-tmpZip");
+                string tempDir = Path.Combine(Environment.GetEnvironmentVariable("WATASK_TVM_SHARED_DIR"), jobId.ToString(), "-tmpZip");
 
                 summary += "Config settings...\n";
                 // Download the settings file from blob storage
-                var settingsContainerRef = _blobClient.GetContainerReference("job-" + jobId );
+                var settingsContainerRef = _blobClient.GetContainerReference("job-" + jobId);
                 summary += "Get blob ref...\n";
                 var blob = settingsContainerRef.GetBlobReference("settings.txt");
-                
+
                 string tmpConfig = Path.Combine(Path.GetTempPath(), "settings.txt");
                 summary += "Downloading settings...\n";
                 blob.DownloadToFile(tmpConfig, FileMode.Create);
@@ -378,20 +391,19 @@ namespace ParallelAPSIM.Batch.JobMgr
 
                 summary += getFreeSpace();
 
+                // fixme - this doesn't work
+                //emailNotify(from, recipient, pw, summary);
+            }
+            catch (Exception err)
+            {
+                summary += err.ToString();
+                throw;
+            }
+            finally
+            {
                 summary += "Storing summary...\n";
                 storeSummary(jobId);
-
             }
-            catch (Exception e)
-            {
-                summary+="Job manager execution failure:" + e.Message + "\n";
-            }
-
-            storeSummary(jobId);
-
-            emailNotify(from, recipient, pw, summary);
-
-            
         }
 
         private bool AnyRunningTasks(Guid jobId)
@@ -451,42 +463,42 @@ namespace ParallelAPSIM.Batch.JobMgr
         private void SubmitTasks(Guid jobId, CancellationToken ct)
         {
 
-            Console.WriteLine("Starting to submit tasks - {0}", DateTime.UtcNow);
+            summary += $"Starting to submit tasks - {DateTime.UtcNow}\n";
 
             var attempts = 0;
 
-            while (attempts++ < 20)
-            {
+            //while (attempts++ < 20)
+            //{
                 if (ct.IsCancellationRequested)
                 {
                     return;
                 }
 
-                try
-                {
+                //try
+                //{
                     BatchClientParallelOptions parallelOptions = new BatchClientParallelOptions()
                     {
                         CancellationToken = ct,
                         MaxDegreeOfParallelism = 4,
                     };
-
+                    summary += "Fetchign tasks to submit...";
                     _batchClient.JobOperations.AddTaskAsync(jobId.ToString(), GetTasksToSubmit(jobId), parallelOptions).Wait(ct);
+                    summary += _taskProvider.Output;
+                    summary += $"Starting to submit tasks - {DateTime.UtcNow}";
 
-                    Console.WriteLine("Starting to submit tasks - {0}", DateTime.UtcNow);
-
-                    break;
-                }
-                catch (AggregateException e)
-                {
-                    Console.WriteLine("An error occurred submitting tasks: {0}", e.InnerException);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("An error occurred submitting tasks: {0}", e);
-                }
+                //    break;
+                //}
+                //catch (AggregateException e)
+                //{
+                //    Console.WriteLine("An error occurred submitting tasks: {0}", e.InnerException);
+                //}
+                //catch (Exception e)
+                //{
+                //    Console.WriteLine("An error occurred submitting tasks: {0}", e);
+                //}
 
                 ct.WaitHandle.WaitOne(TimeSpan.FromSeconds(5));
-            }
+            //}
         }
 
         private void ScalePoolIfNeeded(Guid jobId, string poolId)
@@ -536,8 +548,15 @@ namespace ParallelAPSIM.Batch.JobMgr
 
         private IEnumerable<CloudTask> GetTasksToSubmit(Guid jobId)
         {
-            var existingTaskIds = GetExistingTaskIds(jobId);
-            return _taskProvider.GetTasks(jobId).Where(t => !existingTaskIds.Contains(t.Id));
+            try
+            {
+                var existingTaskIds = GetExistingTaskIds(jobId);
+                return _taskProvider.GetTasks(jobId).ToList().Where(t => !existingTaskIds.Contains(t.Id));
+            }
+            finally
+            {
+                summary += _taskProvider.Output;
+            }
         }
     }
 }

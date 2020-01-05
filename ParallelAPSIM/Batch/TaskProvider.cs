@@ -16,6 +16,8 @@ namespace ParallelAPSIM.Batch
         private readonly string _inputFileOrFolder;
         private readonly StorageCredentials _storageCredentials;
         private readonly int _coresPerProcess;
+        private StringBuilder output;
+        public string Output { get { return output.ToString(); } }
 
         public TaskProvider(
             StorageCredentials storageCredentials,
@@ -25,12 +27,12 @@ namespace ParallelAPSIM.Batch
             _storageCredentials = storageCredentials;
             _inputFileOrFolder = inputZipFileOrFolder;
             _coresPerProcess = coresPerProcess;
+            output = new StringBuilder();
         }
 
         public IEnumerable<CloudTask> GetTasks(Guid jobId)
         {
             var index = 0;
-
             var models = GetApsimModels();
 
             foreach (var model in models)
@@ -75,6 +77,7 @@ namespace ParallelAPSIM.Batch
 
         private IEnumerable<string> GetSimulationsFromZip()
         {
+            output.AppendLine("Getting simulations from zip...");
             using (ZipArchive zip = ZipFile.OpenRead(_inputFileOrFolder))
             {
                 foreach (var zipArchiveEntry in zip.Entries)
@@ -112,11 +115,16 @@ namespace ParallelAPSIM.Batch
 
         private IEnumerable<ApsimModel> GetApsimModels()
         {
+            output.AppendLine("Getting models...");
             if (File.Exists(_inputFileOrFolder) && _inputFileOrFolder.ToLower().EndsWith("zip"))
             {
-                var apsimFilename =  GetApsimFileFromZip();
+                output.AppendLine($"Searching in zip archive: {_inputFileOrFolder}");
+                string apsimFilename =  GetApsimFileFromZip();
+                
+                output.AppendLine($"apsim file name: {apsimFilename}");
                 var simulations = GetSimulationsFromZip();
-
+                if (simulations == null || simulations.Count() < 1)
+                    throw new Exception($"Failed to find any simulations in zip archive {_inputFileOrFolder}");
                 return new[]
                 {
                     new ApsimModel
@@ -129,6 +137,7 @@ namespace ParallelAPSIM.Batch
 
             if (Directory.Exists(_inputFileOrFolder))
             {
+                output.AppendLine($"Searching in directory: {_inputFileOrFolder}");
                 var apsimFiles = ListApsimFiles(_inputFileOrFolder).ToList();
 
                 if (apsimFiles.Any())
@@ -137,9 +146,17 @@ namespace ParallelAPSIM.Batch
 
                     foreach (var apsimFile in apsimFiles)
                     {
+                        output.AppendLine($"Found file {apsimFile}");
                         using (var stream = File.OpenRead(Path.Combine(_inputFileOrFolder, apsimFile)))
                         {
+                            output.AppendLine($"Getting simulations from file {apsimFile}");
                             var simulations = GetSimulationFromApsimFile(stream);
+                            if (simulations == null || simulations.Count() < 1)
+                                throw new Exception($"Error: failed to find any simulations in file {apsimFile}");
+                            
+                            output.AppendLine($"Simulations in {apsimFile}:");
+                            foreach (var sim in simulations)
+                                output.AppendLine($"    {sim}");
 
                             models.Add(new ApsimModel
                             {
@@ -151,6 +168,8 @@ namespace ParallelAPSIM.Batch
 
                     return models;
                 }
+                else
+                    throw new Exception($"Error: failed to find any apsim files in directory {_inputFileOrFolder}");
             }
 
             throw new ArgumentException("Input isn't valid file or directory: " + _inputFileOrFolder);

@@ -15,3 +15,11 @@ C:\SourceTree\AzureJobManager\ParallelAPSIM\obj\Release\ParallelAPSIM.csproj.App
 C:\SourceTree\AzureJobManager\ParallelAPSIM\obj\Release\ParallelAPSIM.csproj.CoreCompileInputs.cache
 C:\SourceTree\AzureJobManager\ParallelAPSIM\obj\Release\azure-apsim.exe
 C:\SourceTree\AzureJobManager\ParallelAPSIM\obj\Release\azure-apsim.pdb
+C:\AzureJobManager\ParallelAPSIM\bin\Release\app.agresearch.config
+C:\AzureJobManager\ParallelAPSIM\bin\Release\azure-apsim.exe.config
+C:\AzureJobManager\ParallelAPSIM\bin\Release\azure-apsim.exe
+C:\AzureJobManager\ParallelAPSIM\bin\Release\azure-apsim.pdb
+C:\AzureJobManager\ParallelAPSIM\obj\Release\ParallelAPSIM.csproj.App.config
+C:\AzureJobManager\ParallelAPSIM\obj\Release\ParallelAPSIM.csprojAssemblyReference.cache
+C:\AzureJobManager\ParallelAPSIM\obj\Release\azure-apsim.exe
+C:\AzureJobManager\ParallelAPSIM\obj\Release\azure-apsim.pdb
