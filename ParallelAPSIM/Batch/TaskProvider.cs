@@ -146,6 +146,7 @@ namespace ParallelAPSIM.Batch
 
                     foreach (var apsimFile in apsimFiles)
                     {
+                        /*
                         output.AppendLine($"Found file {apsimFile}");
                         using (var stream = File.OpenRead(Path.Combine(_inputFileOrFolder, apsimFile)))
                         {
@@ -164,6 +165,12 @@ namespace ParallelAPSIM.Batch
                                 Simulations = simulations,
                             });
                         }
+                        */
+                        models.Add(new ApsimModel
+                        {
+                            ApsimFilename = apsimFile,
+                            Simulations = new[] { apsimFile },
+                        });
                     }
 
                     return models;
