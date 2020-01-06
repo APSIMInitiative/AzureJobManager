@@ -11,6 +11,8 @@ namespace ParallelAPSIM.CommandLine
             return "job-stop";
         }
 
+        public string Output { get { return ""; } }
+
         public int Execute(string[] args, CancellationToken ct)
         {
             try

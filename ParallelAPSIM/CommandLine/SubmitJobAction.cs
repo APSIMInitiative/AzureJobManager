@@ -21,6 +21,8 @@ namespace ParallelAPSIM.CommandLine
             return "job-submit";
         }
 
+        public string Output { get { return ""; } }
+
         public int Execute(string[] args, CancellationToken ct)
         {
             try

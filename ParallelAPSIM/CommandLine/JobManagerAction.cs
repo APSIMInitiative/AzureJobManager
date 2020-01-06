@@ -14,6 +14,10 @@ namespace ParallelAPSIM.CommandLine
             return "job-manager";
         }
 
+        public string Output { get { return jobManager?.Summary; } }
+
+        private Batch.JobMgr.JobManager jobManager;
+
         public int Execute(string[] args, CancellationToken ct)
         {
             ValidateArgs(args);
@@ -29,7 +33,7 @@ namespace ParallelAPSIM.CommandLine
 
             int coresPerProcess = 1;
 
-            var jobManager = new Batch.JobMgr.JobManager(
+            jobManager = new Batch.JobMgr.JobManager(
                     GetBatchCredentialsFromArgs(args),
                     GetStorageCredentialsFromArgs(args),
                     new TaskProvider(

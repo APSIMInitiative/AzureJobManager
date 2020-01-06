@@ -49,6 +49,16 @@ namespace ParallelAPSIM
             }
             finally
             {
+                try
+                {
+                    summary.AppendLine("Job output:");
+                    summary.AppendLine(_actions[args[0]].Output);
+                }
+                catch (Exception err)
+                {
+                    summary.AppendLine($"Unable to append job output to summary:");
+                    summary.AppendLine(err.ToString());
+                }
                 storeSummary(summary.ToString(), args);
             }
             Environment.Exit(result);

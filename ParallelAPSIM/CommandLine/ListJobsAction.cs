@@ -15,6 +15,8 @@ namespace ParallelAPSIM.CommandLine
             return "job-list";
         }
 
+        public string Output { get { return ""; } }
+
         public int Execute(string[] args, CancellationToken ct)
         {
             try

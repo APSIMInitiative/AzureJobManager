@@ -28,6 +28,8 @@ namespace ParallelAPSIM.Batch.JobMgr
 
         string summary = "";
 
+        public string Summary { get { return summary; } }
+
         public JobManager(
             BatchCredentials batchCredentials,
             StorageCredentials storageCredentials,
@@ -354,24 +356,28 @@ namespace ParallelAPSIM.Batch.JobMgr
                 var settingsContainerRef = _blobClient.GetContainerReference("job-" + jobId);
                 summary += "Get blob ref...\n";
                 var blob = settingsContainerRef.GetBlobReference("settings.txt");
+                if (blob.Exists())
+                {
+                    string tmpConfig = Path.Combine(Path.GetTempPath(), "settings.txt");
+                    summary += "Downloading settings...\n";
+                    blob.DownloadToFile(tmpConfig, FileMode.Create);
 
-                string tmpConfig = Path.Combine(Path.GetTempPath(), "settings.txt");
-                summary += "Downloading settings...\n";
-                blob.DownloadToFile(tmpConfig, FileMode.Create);
+                    summary += "Reading settings...\n";
+                    string config = File.ReadAllText(tmpConfig);
 
-                summary += "Reading settings...\n";
-                string config = File.ReadAllText(tmpConfig);
+                    recipient = getConfigSetting(config, "EmailRecipient");
+                    from = getConfigSetting(config, "EmailSender");
+                    pw = getConfigSetting(config, "EmailPW");
 
-                recipient = getConfigSetting(config, "EmailRecipient");
-                from = getConfigSetting(config, "EmailSender");
-                pw = getConfigSetting(config, "EmailPW");
+                    summary += "Recipient='" + recipient + "'\n";
+                    summary += "Sender='" + from + "'\n";
+                    //summary += "pw=" + pw+ "\n";
 
-                summary += "Recipient='" + recipient + "'\n";
-                summary += "Sender='" + from + "'\n";
-                //summary += "pw=" + pw+ "\n";
-
-                summary += "Deleting tmp settings file...\n";
-                File.Delete(tmpConfig);
+                    summary += "Deleting tmp settings file...\n";
+                    File.Delete(tmpConfig);
+                }
+                else
+                    summary += "settings.txt does not exist. No email will be sent on job completion...\n";
 
                 int result = zipResults(jobId, tempDir, ct);
                 if (result == 0)
@@ -481,10 +487,10 @@ namespace ParallelAPSIM.Batch.JobMgr
                         CancellationToken = ct,
                         MaxDegreeOfParallelism = 4,
                     };
-                    summary += "Fetchign tasks to submit...";
+                    summary += "Fetching tasks to submit...\n";
                     _batchClient.JobOperations.AddTaskAsync(jobId.ToString(), GetTasksToSubmit(jobId), parallelOptions).Wait(ct);
                     summary += _taskProvider.Output;
-                    summary += $"Starting to submit tasks - {DateTime.UtcNow}";
+                    summary += $"Starting to submit tasks - {DateTime.UtcNow}\n";
 
                 //    break;
                 //}
