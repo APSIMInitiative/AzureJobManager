@@ -14,5 +14,7 @@ namespace ParallelAPSIM.CommandLine
         int Execute(string[] args, CancellationToken ct);
 
         string GetUsage();
+
+        string Output { get; }
     }
 }

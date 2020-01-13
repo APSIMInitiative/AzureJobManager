@@ -14,57 +14,36 @@ namespace ParallelAPSIM.CommandLine
             return "job-manager";
         }
 
+        public string Output { get { return jobManager?.Summary; } }
+
+        private Batch.JobMgr.JobManager jobManager;
+
         public int Execute(string[] args, CancellationToken ct)
         {
-            try
-            {
-                ValidateArgs(args);
-            }
-            catch (ArgumentException e)
-            {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(GetUsage());
-                return 1;
-            }
+            ValidateArgs(args);
 
-            try
-            {
-                var jobId = Guid.Parse(args[5]);
-                var inputZipOrFolder = args[6];
+            var jobId = Guid.Parse(args[5]);
+            var inputZipOrFolder = args[6];
 
-                bool submitTasks = true;
-                bool.TryParse(args[7], out submitTasks);
+            bool submitTasks = true;
+            bool.TryParse(args[7], out submitTasks);
 
-                bool autoScaleEnabled = false;
-                bool.TryParse(args[8], out autoScaleEnabled);
+            bool autoScaleEnabled = false;
+            bool.TryParse(args[8], out autoScaleEnabled);
 
-                int coresPerProcess = 1;
+            int coresPerProcess = 1;
 
-                var jobManager = new Batch.JobMgr.JobManager(
-                        GetBatchCredentialsFromArgs(args),
-                        GetStorageCredentialsFromArgs(args),
-                        new TaskProvider(
-                                GetStorageCredentialsFromArgs(args),
-                                inputZipOrFolder,
-                                coresPerProcess));
+            jobManager = new Batch.JobMgr.JobManager(
+                    GetBatchCredentialsFromArgs(args),
+                    GetStorageCredentialsFromArgs(args),
+                    new TaskProvider(
+                            GetStorageCredentialsFromArgs(args),
+                            inputZipOrFolder,
+                            coresPerProcess));
 
-                jobManager.Execute(jobId, submitTasks, autoScaleEnabled, ct);
+            jobManager.Execute(jobId, submitTasks, autoScaleEnabled, ct);
 
-                return 0;
-            }
-            catch (AggregateException e)
-            {
-                var unwrapped = ExceptionHelper.UnwrapAggregateException(e);
-                Console.WriteLine(unwrapped.Message);
-                Console.WriteLine(unwrapped.StackTrace);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-            }
-
-            return 1;
+            return 0;
         }
 
         public string GetUsage()

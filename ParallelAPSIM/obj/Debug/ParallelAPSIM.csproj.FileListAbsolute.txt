@@ -7,3 +7,11 @@ M:\svn\ParallelAPSIM\ParallelAPSIM\bin\Debug\app.agresearch.config
 M:\svn\ParallelAPSIM\ParallelAPSIM\bin\Debug\azure-apsim.exe.config
 M:\svn\ParallelAPSIM\ParallelAPSIM\bin\Debug\azure-apsim.exe
 M:\svn\ParallelAPSIM\ParallelAPSIM\bin\Debug\azure-apsim.pdb
+C:\AzureJobManager\ParallelAPSIM\bin\Debug\app.agresearch.config
+C:\AzureJobManager\ParallelAPSIM\bin\Debug\azure-apsim.exe.config
+C:\AzureJobManager\ParallelAPSIM\bin\Debug\azure-apsim.exe
+C:\AzureJobManager\ParallelAPSIM\bin\Debug\azure-apsim.pdb
+C:\AzureJobManager\ParallelAPSIM\obj\Debug\ParallelAPSIM.csproj.App.config
+C:\AzureJobManager\ParallelAPSIM\obj\Debug\ParallelAPSIM.csprojAssemblyReference.cache
+C:\AzureJobManager\ParallelAPSIM\obj\Debug\azure-apsim.exe
+C:\AzureJobManager\ParallelAPSIM\obj\Debug\azure-apsim.pdb

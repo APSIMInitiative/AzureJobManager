@@ -10,5 +10,7 @@ namespace ParallelAPSIM.Batch
     public interface ITaskProvider
     {
         IEnumerable<CloudTask> GetTasks(Guid jobId);
+
+        string Output { get; }
     }
 }
